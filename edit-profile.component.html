@@ -1,0 +1,335 @@
+<app-header></app-header>
+<div class="user-section-container">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <h2 class="pagetitle">{{'profile.profile_heading'| translate}}</h2>
+      </div>
+
+      <div class="col-sm-12">
+        <div class="notification">
+            {{'profile.update_info_text'| translate}}
+        </div>
+      </div>
+
+      <div class="col-sm-7">
+        <div class="info-editable-tabs">
+
+          <nav class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link" [ngClass]="{active:!openTab}" id="nav-personal-tab" data-toggle="tab" href="#nav-personal" role="tab"
+              aria-controls="personal" aria-expanded="true">{{'profile.profile_info'| translate}}</a>
+            <a class="nav-item nav-link" [ngClass]="{active:openTab}" id="nav-company-tab" data-toggle="tab" href="#nav-company" role="tab"
+              aria-controls="company" aria-expanded="false">{{'profile.company_info'| translate}}</a>
+          </nav>
+
+          <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade" [ngClass]="{'active':!openTab,'show':!openTab}" id="nav-personal" role="tabpanel" aria-labelledby="nav-personal-tab"
+              aria-expanded="true">
+              <form [formGroup]="editProfileForm" class="form-validation" (submit)="updateProfile($event)">
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">Profile Pic</label>
+                      <div class="uploadOuter">
+                        <input type="text" class="uploadText" />
+                        <input type="file" accept="image/*" (change)="onImageChange($event)" class="uploadFile" />
+                        <span>{{'profile.upload_photo'| translate}}</span>
+                        <div *ngIf="profileImage" class="Preview">
+                          <img src="{{profileImage}}" alt="" />
+                        </div>
+                        <div *ngIf="!profileImage" class="Preview">
+                          <img src="" alt="" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 col-sm-12">
+                    <label class="control-label">{{'profile.title'| translate}}</label>
+                    <div class="form-group">
+                      <label class="control-label radioLabel"> {{'profile.mr'| translate}}
+                        <input type="radio" name="title" value="Mr" formControlName="title">
+                        <span class="radiomark"></span>
+                      </label>
+
+                      <label class="control-label radioLabel"> {{'profile.mrs'| translate}}
+                        <input type="radio" name="title" value="Mrs" formControlName="title">
+                        <span class="radiomark"></span>
+                      </label>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.mobile'| translate}}</label>
+                      <input *ngIf='countryCode' (keypress)="validateNum($event)" type="text" class="form-control underline-input" ng2TelInput
+                        [ng2TelInputOptions]="{initialCountry: countryCode}" formControlName="phone" (countryChange)="onCountryChange($event)"
+                      />
+                      <p class="error" *ngIf="editProfileForm.controls['phone'].hasError('required') && isSubmited">
+                          {{'common_head.mobile_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'common_head.name'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="fname" name="fname" />
+                      <p class="error" *ngIf="editProfileForm.controls['fname'].hasError('required') && isSubmited">
+                          {{'common_head.fname_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label>{{'common_head.surname'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="lname" name="lname" />
+                      <p class="error" *ngIf="editProfileForm.controls['lname'].hasError('required') && isSubmited">
+                          {{'common_head.lname_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label>{{'common_head.email'| translate}}</label>
+                      <input type="email" [readonly]="true" class="form-control underline-input" formControlName="email" name="email" />
+                      <p class="error" *ngIf="editProfileForm.controls['email'].hasError('required') && isSubmited">
+                          {{'common_head.email_required'| translate}}
+                      </p>
+                      <p class="error" *ngIf="editProfileForm.controls['email'].hasError('pattern')">
+                          {{'common_head.invalid_email'| translate}}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.language'| translate}}</label>
+                      <select class="form-control underline-input" #t formControlName="language" name="language" (change)="setLangForUser(t.value)">
+                        <option *ngFor="let language of laguageList" [value]="language">
+                          {{language}}
+                        </option>
+                      </select>
+                      <!-- <p class="error" *ngIf="editProfileForm.controls['language'].hasError('required') && isSubmited">
+                        Select your preferred language
+                      </p> -->
+                    </div>
+                  </div>
+
+                </div>
+                <button type="submit" class="submit-btn">{{'profile.update_btn'| translate}}</button>
+              </form>
+            </div>
+
+
+            <div class="tab-pane fade" [ngClass]="{'active':openTab,'show':openTab}" id="nav-company" role="tabpanel" aria-labelledby="nav-company-tab"
+              aria-expanded="false">
+              <form [formGroup]="editcompanyForm" class="form-validation" (submit)="updateCompanyInfo()">
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'common_head.company_name'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="company_name" name="company_name" />
+                      <p class="error" *ngIf="editcompanyForm.controls['company_name'].hasError('required') && isCompSubmited">
+                       {{'common_head.company_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'common_head.company_vat'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="vat_number" name="vat_number">
+                      <p class="error" *ngIf="editcompanyForm.controls['vat_number'].hasError('required') && isCompSubmited">
+                          {{'common_head.vat_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.job_title'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="job_title" name="job_title"
+                      />
+                      <!-- <p class="error" *ngIf="editcompanyForm.controls['job_title'].hasError('required') && isCompSubmited">
+                        Job title is required
+                      </p> -->
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.industry'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="industry" name="industry"
+                      />
+                      <!-- <p class="error" *ngIf="editcompanyForm.controls['industry'].hasError('required') && isCompSubmited">
+                        Industry name is required
+                      </p> -->
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.street'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="street" name="street"
+                      />
+                      <p class="error" *ngIf="editcompanyForm.controls['street'].hasError('required') && isCompSubmited">
+                          {{'profile.street_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.postal_code'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="postal_code" name="zip"
+                      />
+                      <p class="error" *ngIf="editcompanyForm.controls['postal_code'].hasError('required') && isCompSubmited">
+                        {{'profile.postal_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.city'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="city" name="city" />
+                      <p class="error" *ngIf="editcompanyForm.controls['city'].hasError('required') && isCompSubmited">
+                          {{'profile.city_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.state'| translate}}</label>
+                      <input type="text" class="form-control underline-input" formControlName="state" name="state" />
+                      <p class="error" *ngIf="editcompanyForm.controls['state'].hasError('required') && isCompSubmited">
+                          {{'profile.state_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.country'| translate}}</label>
+                      <select class="form-control underline-input" formControlName="country" name="country">
+                        <option value="">- select -</option>
+                        <option *ngFor="let country of countries" value="{{country._id}}">
+                          {{country.name}}
+                        </option>
+                      </select>
+                      <p class="error" *ngIf="editcompanyForm.controls['country'].hasError('required') && isCompSubmited">
+                          {{'profile.country_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.company_phone'| translate}}</label>
+                      <input *ngIf='countryCodeCompany' (keypress)="validateCompanyNo($event)" type="text" class="form-control underline-input"
+                        ng2TelInput [ng2TelInputOptions]="{initialCountry: countryCodeCompany}" formControlName="company_phone"
+                        (countryChange)="onCompCountryChange($event)" />
+                      <p class="error" *ngIf="editcompanyForm.controls['company_phone'].hasError('required') && isCompSubmited">
+                          {{'profile.companyphone_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-sm-12">
+                    <div class="form-group">
+                      <label class="control-label">{{'profile.company_type'| translate}}</label>
+                      <select class="form-control" formControlName="company_type" name="company_type">
+                        <option value="">Select</option>
+                        <option value="meeting" *ngFor="let item of categoryAttr" [value]='item._id'>{{item.name}}</option>
+                      </select>
+                      <p class="error" *ngIf="editcompanyForm.controls['company_type'].hasError('required') && isCompSubmited">
+                          {{'profile.companytype_required'| translate}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="submit-btn">{{'profile.update_btn'| translate}}</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- image upload -->
+      <div class="col-sm-4 offset-sm-1">
+        <h2 class="subBlockHead">{{'profile.change_password'| translate}}</h2>
+
+        <form [formGroup]="changePwdForm" class="changePasswordForm" (submit)="updatePassword()">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label class="control-label">{{'profile.old_password'| translate}}</label>
+                <input type="password" class="form-control" aria-label="Password" formControlName="password" name="password">
+                <p class="error" *ngIf="changePwdForm.controls['password'].hasError('required') && isPasswordSubmited">
+                    {{'common_head.password_required'| translate}}
+                </p>
+                <p class="error" *ngIf="changePwdForm.controls['password'].hasError('maxlength')">
+                    {{'common_head.max_char'| translate}}
+                </p>
+                <p class="error" *ngIf="changePwdForm.controls['password'].hasError('minlength')">
+                    {{'common_head.password_length'| translate}}
+                </p>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label">{{'profile.new_password'| translate}}</label>
+                <input type="password" class="form-control" aria-label="new_password" #pass formControlName="new_password"
+                  name="new_password">
+                <p class="error" *ngIf="changePwdForm.controls['new_password'].hasError('required') && isPasswordSubmited">
+                    {{'common_head.password_required'| translate}}
+                </p>
+                <p class="error" *ngIf="changePwdForm.controls['new_password'].hasError('maxlength')">
+                    {{'common_head.max_char'| translate}}
+                </p>
+                <p class="error" *ngIf="changePwdForm.controls['new_password'].hasError('minlength')">
+                    {{'common_head.password_length'| translate}}
+                </p>
+              </div>
+
+              <div class="form-group">
+                <label class="control-label">{{'common_head.confirm_password'| translate}}</label>
+                <input type="password" class="form-control" aria-label="confirm_password" formControlName="confirm_password"
+                  (change)="changePassword(chngpass.value,pass.value)" #chngpass name="confirm_password">
+                <p class="error" *ngIf="changePwdForm.controls['confirm_password'].hasError('required') && isPasswordSubmited">
+                    {{'common_head.password_required'| translate}}
+                </p>
+                <p class="error" *ngIf="changePwdForm.controls['confirm_password'].hasError('maxlength')">
+                    {{'common_head.max_char'| translate}}
+                </p>
+                <p class="error" *ngIf="changePwdForm.controls['confirm_password'].hasError('minlength')">
+                    {{'common_head.password_length'| translate}}
+                </p>
+                <p class="error" *ngIf="passnotmatched && !changePwdForm.controls['confirm_password'].hasError('minlength') && !changePwdForm.controls['password'].hasError('required')">
+                    {{'common_head.password_notmatched'| translate}}
+                </p>
+              </div>
+
+              <button type="submit" class="submit-btn">{{'profile.update_btn'| translate}}</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>
+<p-growl baseZIndex="1" [(value)]="msgs"></p-growl>
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '14px',fullScreenBackdrop:true }"></ngx-loading>
